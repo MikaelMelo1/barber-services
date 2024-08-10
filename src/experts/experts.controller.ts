@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpStatus, Post, Res } from '@nestjs/common';
 import { ExpertsService } from './experts.service';
 import CreateExpertsDto from './dtos/create-experts';
 import { Response } from 'express';
@@ -14,8 +14,13 @@ export class ExpertsController {
       throw new BadRequestException('Existe um profissional com o email informado')
     }
    
-
     const expert = await this.expertsService.createExpert(data)
     return res.status(HttpStatus.CREATED).json(expert)
+  }
+
+  @Get()
+  async getExperts(@Res() res:Response) {
+    const experts = await this.expertsService.findAllExperts();
+    return res.json(experts)
   }
 }
