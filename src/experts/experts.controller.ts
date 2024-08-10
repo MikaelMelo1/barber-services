@@ -6,12 +6,15 @@ import {
   HttpStatus,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Res,
 } from "@nestjs/common";
 import { ExpertsService } from "./experts.service";
 import CreateExpertsDto from "./dtos/create-experts";
 import { Response } from "express";
+import updateExpertDto from "./dtos/update-experts";
+import exp from "constants";
 
 @Controller("experts")
 export class ExpertsController {
@@ -45,7 +48,31 @@ export class ExpertsController {
     if (!expert) {
       throw new NotFoundException("Profissional não encontrado");
     }
-
     return res.json(expert);
   }
+
+  @Patch(":id")
+  async updateExpert(@Param("id") id: string, @Body() data: updateExpertDto, @Res() res: Response) {
+    const expert = await this.expertsService.findExpert(id);
+    if (!expert) {
+      throw new NotFoundException("Profissional não encontrado");
+    }
+
+    if (data.email) {
+      const emailExists = await this.expertsService.findExpertByEmail(
+        data.email
+      );
+      if (emailExists && emailExists.id !== expert.email) {
+        throw new BadRequestException(
+          "Existe um profissional com o email informado"
+        );
+      }
+
+
+      await this.expertsService.updateExpert(id, {...expert, ...data});
+    return res.status(HttpStatus.NO_CONTENT).send();
+    }
+  }
+
+
 }
