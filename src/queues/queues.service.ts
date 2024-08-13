@@ -23,5 +23,40 @@ export class QueuesService {
         }
       });
     }
+
+    async getExpertQueues(expertId) {
+      return await this.prisma.queue.findMany({
+        where: {
+          expertId
+        }, 
+        include: {
+          expert: true
+        }
+      })
+
+    }
+
+
+    async getQueues() {
+      return await this.prisma.queue.findMany({
+      })
+
+    }
+
+
+    async getQueuesToday() {
+      const queueToday = await this.prisma.queue.findMany({
+        where: {
+          createdAt: {
+            equals: new Date()
+          }
+        },
+        include:  {
+          expert: true,
+          queuecustomers: true
+        },
+        
+      });
+    }
   }
 
