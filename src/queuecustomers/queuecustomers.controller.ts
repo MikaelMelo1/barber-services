@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, NotFoundException, Post, Res } from "@nestjs/common";
+import { Body, Controller, HttpStatus, NotFoundException, Param, Patch, Post, Res } from "@nestjs/common";
 import { QueuecustomersService } from "./queuecustomers.service";
 import CreateQueueCustomersDto from "./dtos/create-queuecustomers";
 import { Response } from "express";
@@ -25,5 +25,16 @@ export class QueuecustomersController {
 
     return res.status(HttpStatus.CREATED).json(customer); 
 
+  }
+  @Patch('id')
+  async attendCustomer(@Param('id') id: string, @Res() res: Response) {
+    const customer = await this.queuecustomersService.findCustomer(+id)
+
+    if (!customer) {
+      throw new NotFoundException('Fila não encontrada');
+     }
+
+     await this.queuecustomersService.attendCustomer(customer.Id);
+     return res.status(HttpStatus.NO_CONTENT).send();
   }
 }
